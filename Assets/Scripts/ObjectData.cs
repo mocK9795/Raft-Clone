@@ -10,6 +10,7 @@ public class ObjectData : MonoBehaviour
 	public bool createConvexMesh = true;
 	public bool withinParent = false;
     public Vector3 velocity;
+	public Inventory inventory;
 	[HideInInspector] public float forceOfGravity;
 	[HideInInspector] public bool isInWater;
 

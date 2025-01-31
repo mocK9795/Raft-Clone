@@ -105,7 +105,12 @@ MonoBehaviour:
   moveMode: 1
   interact: 1
   createConvexMesh: 1
+  withinParent: 0
   velocity: {x: 0, y: 0, z: 0}
+  inventory:
+    items:
+    - name: Plank
+      count: 1
   forceOfGravity: 0
   isInWater: 0
   data: {fileID: 0}

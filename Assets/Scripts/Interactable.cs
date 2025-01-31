@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour
 {
-    public enum InteractionType {Boat};
+    public enum InteractionType {Boat, Hook};
     public InteractionType interacterType;
     public Vector3 offset;
-    public float speedBonus;
+    public float bonus;
+    public float range;
 }

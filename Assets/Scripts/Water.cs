@@ -5,6 +5,7 @@ public class Water : MonoBehaviour
 	public float floatOffset;
 	public float density;
 	public Vector2 flowDirection;
+	public Vector2 raftFlowDirection;
 	[HideInInspector] public BoxCollider box;
 	GlobalData data;
 
@@ -21,11 +22,17 @@ public class Water : MonoBehaviour
 		if (Raft.IsRaftComponent(floatingObject))
 		{
 			floatingObject = floatingObject.transform.parent.GetComponent<ObjectData>();
+			floatingObject.velocity += (new Vector3(raftFlowDirection.x, 0, raftFlowDirection.y)
+				* Time.deltaTime) / floatingObject.mass;
+		}
+		else
+		{
+			floatingObject.velocity += (new Vector3(flowDirection.x, 0, flowDirection.y) 
+				* Time.deltaTime) / floatingObject.mass;
 		}
 
 		float boyancyProvided = density * data.gravity * ((transform.position.y + floatOffset) - floatingObject.transform.position.y) * Time.deltaTime;
 		floatingObject.velocity.y += boyancyProvided;
-		floatingObject.velocity += (new Vector3(flowDirection.x, 0, flowDirection.y) * Time.deltaTime) / floatingObject.mass;
 	}
 
 	private void OnTriggerEnter(Collider other)

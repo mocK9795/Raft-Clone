@@ -12,25 +12,31 @@ public class Player : ObjectData
 	public float swimJumpHeight;
 	public float speed;
 	public float swimSpeed;
+	
 	[Header("Object Masks")]
 	public LayerMask yoinkableObjects;
 	public LayerMask waterMask;
+	public int selectedLayer;
+	public int interactableLayer;
+	
 	[Header("Interaction")]
 	public Raft raft;
 	public GameObject buildObject;
 	public float boatLeaveVelocity = 2f;
-	float currentSpeed;
+	
 	Vector2 moveDirection;
 	PlayerCamera playerCamera;
 	ObjectData lastSelectedObject;
 	Interactable lastInteractable;
 	Console console;
+	
+	[HideInInspector]
 	public bool isBuilding;
 	bool isJumping;
-
-	List<ObjectData> inventory = new List<ObjectData>();
+	float currentSpeed;
 
 	bool boatInteracter;
+	bool usingHook;
 
 	public void OnMove(InputAction.CallbackContext value)
 	{
@@ -54,7 +60,7 @@ public class Player : ObjectData
 		}
 		if (boatInteracter)
 		{
-			currentSpeed = lastInteractable.speedBonus;
+			currentSpeed = lastInteractable.bonus;
 		}
 		velocity += (transform.right * moveDirection.x + transform.forward * moveDirection.y) * currentSpeed * Time.deltaTime;
 			
@@ -75,9 +81,17 @@ public class Player : ObjectData
 				lastInteractable.transform.parent = transform.parent;
 				velocity += Vector3.up * jumpHeight * boatLeaveVelocity;
 			}
+
+			if (usingHook)
+			{
+				lastSelectedObject.enabled = true;
+				lastInteractable.transform.parent = transform.parent;
+				lastSelectedObject.gameObject.layer = interactableLayer;
+			}
 		}
 		isBuilding = false;
 		boatInteracter = false;
+		usingHook = false;
 		lastInteractable = null;
 
 		int lastSelectedId = -1;
@@ -95,7 +109,7 @@ public class Player : ObjectData
 
 		selectedObject.Outline();
 		lastSelectedObject = selectedObject;
-		
+
 		if (Raft.IsRaftComponent(selectedObject))
 		{
 			isBuilding = true;
@@ -114,7 +128,18 @@ public class Player : ObjectData
 			transform.position += interacter.offset;
 			interacter.transform.parent = transform;
 		}
-		
+
+		if (interacter.interacterType == Interactable.InteractionType.Hook)
+		{
+			usingHook = true;
+			selectedObject.gameObject.layer = selectedLayer;
+			selectedObject.enabled = false;
+			interacter.transform.parent = transform;
+			Vector3 interacterRotation = interacter.transform.eulerAngles;
+			interacter.transform.localRotation = Quaternion.Euler(interacterRotation.x, 0, interacterRotation.z);
+			interacter.transform.localPosition = interacter.offset;
+		}
+
 	}
 
 	public void OnInteract(InputAction.CallbackContext value) { if (value.canceled) OnInteract(); }
@@ -131,19 +156,30 @@ public class Player : ObjectData
 			if (!success) Destroy(builtObject);
 			return;
 		}
+		else if (usingHook)
+		{
+			if (!Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit rayInfo, yoinkRange + lastInteractable.range, yoinkableObjects)) return;
+			ObjectData hookedObject = rayInfo.collider.GetComponent<ObjectData>();
+			print(hookedObject.name);
+
+			if (hookedObject == null) return;
+			if (hookedObject.withinParent) return;
+
+			hookedObject.velocity += (transform.position - hookedObject.transform.position) * lastInteractable.bonus;
+
+			return;
+		}
 
 		if (!Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hitInfo, yoinkRange, yoinkableObjects)) return;
 		print(hitInfo.collider.name);
 		ObjectData selectedObject = hitInfo.collider.GetComponent<ObjectData>();
 
 		if (selectedObject == null) return;
-
 		if (selectedObject.withinParent) return;
 
-		inventory.Add(selectedObject);
-		selectedObject.gameObject.SetActive(false);
-
+		inventory.Add(selectedObject.inventory);
 		console.Message("Picked Up " + hitInfo.collider.name);
+		Destroy(selectedObject.gameObject);
 	}
 
 	public void OnAttack(InputAction.CallbackContext value) {if (value.canceled) OnAttack();}
