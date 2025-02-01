@@ -18,9 +18,9 @@ public class Water : MonoBehaviour
 	private void OnTriggerStay(Collider other)
 	{
 		ObjectData floatingObject = other.GetComponent<ObjectData>();
-		float boyancyProvided = 0;
+		float boyancyProvided;
 		if (floatingObject == null) return;
-		if (Raft.IsRaftComponent(floatingObject))
+		else if (Raft.IsRaftComponent(floatingObject))
 		{
 			floatingObject = floatingObject.transform.parent.GetComponent<ObjectData>();
 			Raft raft = floatingObject.GetComponent<Raft>();

@@ -10,6 +10,7 @@ public class Player : ObjectData
 	public float yoinkRange;
 	public float jumpHeight;
 	public float swimJumpHeight;
+	public float crouchStrength;
 	public float speed;
 	public float swimSpeed;
 	
@@ -18,9 +19,11 @@ public class Player : ObjectData
 	public LayerMask waterMask;
 	public int selectedLayer;
 	public int interactableLayer;
+	int lastPickedUpItemLayer;
 	
 	[Header("Interaction")]
 	public Raft raft;
+	public ObjectData heldItem;
 	public GameObject buildObject;
 	public float boatLeaveVelocity = 2f;
 	
@@ -33,10 +36,13 @@ public class Player : ObjectData
 	[HideInInspector]
 	public bool isBuilding;
 	bool isJumping;
+	bool isCrouching;
 	float currentSpeed;
 
 	bool boatInteracter;
 	bool usingHook;
+
+	public void OnCrouch(InputAction.CallbackContext value) { isCrouching = !value.canceled; }
 
 	public void OnMove(InputAction.CallbackContext value)
 	{
@@ -48,6 +54,7 @@ public class Player : ObjectData
 		if (isInWater)
 		{
 			if (isJumping) velocity.y += swimJumpHeight * Time.deltaTime;
+			if (isCrouching) velocity.y -= crouchStrength * Time.deltaTime;
 			currentSpeed = swimSpeed;
 		}
 		else if (controller.isGrounded)
@@ -149,7 +156,6 @@ public class Player : ObjectData
 		if (isBuilding)
 		{
 			if (!Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit rayInfo, yoinkRange, waterMask)) return;
-			print(rayInfo.collider.name);
 			GameObject builtObject = Instantiate(buildObject);
 			builtObject.transform.position = rayInfo.point;
 			bool success = raft.AddComponent(builtObject);
@@ -160,7 +166,6 @@ public class Player : ObjectData
 		{
 			if (!Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit rayInfo, yoinkRange + lastInteractable.range, yoinkableObjects)) return;
 			ObjectData hookedObject = rayInfo.collider.GetComponent<ObjectData>();
-			print(hookedObject.name);
 
 			if (hookedObject == null) return;
 			if (hookedObject.withinParent) return;
@@ -170,16 +175,31 @@ public class Player : ObjectData
 			return;
 		}
 
+		int lastHeldItemIndex = -1;
+		if (heldItem != null)
+		{
+			lastHeldItemIndex = heldItem.gameObject.GetInstanceID();
+			heldItem.gameObject.layer = lastPickedUpItemLayer;
+			heldItem.transform.parent = transform.parent;
+			heldItem.enabled = true;
+			heldItem.velocity = Vector3.zero;
+			heldItem = null;
+		}
 		if (!Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hitInfo, yoinkRange, yoinkableObjects)) return;
-		print(hitInfo.collider.name);
-		ObjectData selectedObject = hitInfo.collider.GetComponent<ObjectData>();
 
-		if (selectedObject == null) return;
-		if (selectedObject.withinParent) return;
+		heldItem = hitInfo.collider.GetComponent<ObjectData>();
 
-		inventory.Add(selectedObject.inventory);
-		console.Message("Picked Up " + hitInfo.collider.name);
-		Destroy(selectedObject.gameObject);
+		if (heldItem == null) return;
+		if (heldItem.withinParent) return;
+		if (heldItem.gameObject.GetInstanceID() == lastHeldItemIndex) return;
+
+		heldItem.enabled = false;
+		lastPickedUpItemLayer = heldItem.gameObject.layer;
+		heldItem.gameObject.layer = selectedLayer;
+		heldItem.transform.parent = transform;
+		heldItem.transform.localPosition = data.heldItemOffset;
+		Vector3 heldItemRotation = heldItem.transform.eulerAngles;
+		heldItem.transform.localRotation = Quaternion.Euler(heldItemRotation.x, 0, heldItemRotation.z);
 	}
 
 	public void OnAttack(InputAction.CallbackContext value) {if (value.canceled) OnAttack();}

@@ -791,6 +791,7 @@ MonoBehaviour:
   yoinkRange: 3
   jumpHeight: 3
   swimJumpHeight: 2.5
+  crouchStrength: 30
   speed: 6
   swimSpeed: 2
   yoinkableObjects:
@@ -802,6 +803,7 @@ MonoBehaviour:
   selectedLayer: 7
   interactableLayer: 3
   raft: {fileID: 1710728870}
+  heldItem: {fileID: 0}
   buildObject: {fileID: 8621602313980781530, guid: 65641bf7a51b47c4f84f2300f4fb899a, type: 3}
   boatLeaveVelocity: 2
   isBuilding: 0
@@ -941,7 +943,19 @@ MonoBehaviour:
     m_ActionId: 852140f2-7766-474d-8707-702459ba45f3
     m_ActionName: 'Player/Interact[/Keyboard/e]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 724599171}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: OnCrouch
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 27c5f898-bc57-4ee1-8800-db469aca5fe3
     m_ActionName: 'Player/Crouch[/Keyboard/c]'
   - m_PersistentCalls:
@@ -1322,6 +1336,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Hook
       objectReference: {fileID: 0}
+    - target: {fileID: 7730543801981773382, guid: 40988a038bb95a44fb0cfc7d333727eb, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1367,7 +1385,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 32, y: 32}
+  m_SizeDelta: {x: 34, y: 34}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1054794953
 MonoBehaviour:
@@ -1418,6 +1436,7 @@ GameObject:
   - component: {fileID: 1087618485}
   - component: {fileID: 1087618486}
   - component: {fileID: 1087618487}
+  - component: {fileID: 1087618488}
   m_Layer: 0
   m_Name: Environment
   m_TagString: Untagged
@@ -1457,6 +1476,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravity: 1
   friction: 1
+  heldItemOffset: {x: 0, y: 0.4, z: 2}
   outlineMaterial: {fileID: 2100000, guid: 48e8487f9681f824dbe041f644a778d3, type: 2}
   nullMaterial: {fileID: 2100000, guid: bcb301d1cbddef24eaa97f808d9e9717, type: 2}
   water: {fileID: 918964871}
@@ -1483,6 +1503,21 @@ MonoBehaviour:
   - {fileID: 919132149155446097, guid: 01c0dfff51c95e049b86887852cf267e, type: 3}
   - {fileID: 7730543801981773382, guid: 40988a038bb95a44fb0cfc7d333727eb, type: 3}
   - {fileID: 8621602313980781530, guid: 65641bf7a51b47c4f84f2300f4fb899a, type: 3}
+--- !u!114 &1087618488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1087618484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cc7e786851184a43b7f5a7984d40d5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  underwaterEffect: {fileID: -1514474015794959058, guid: f288ae1f4751b564a96ac7587541f7a2, type: 2}
+  target: {fileID: 330585546}
+  water: {fileID: 918964875}
 --- !u!1 &1277619921
 GameObject:
   m_ObjectHideFlags: 0
@@ -1711,6 +1746,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Rock
       objectReference: {fileID: 0}
+    - target: {fileID: 8786913206190734177, guid: 16613f906c6fea54d9879aa1c29ab95f, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1834,6 +1873,10 @@ PrefabInstance:
     - target: {fileID: 1223878501578180532, guid: 00e17f88c23c5b54eb3669d7ba3770db, type: 3}
       propertyPath: m_Name
       value: Plank
+      objectReference: {fileID: 0}
+    - target: {fileID: 1223878501578180532, guid: 00e17f88c23c5b54eb3669d7ba3770db, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5319229203281325607, guid: 00e17f88c23c5b54eb3669d7ba3770db, type: 3}
       propertyPath: m_LocalPosition.x
