@@ -71,6 +71,7 @@
     <Compile Include="Assets\Scripts\UI\Console.cs" />
     <Compile Include="Assets\Scripts\ObjectData.cs" />
     <Compile Include="Assets\Scripts\Raft.cs" />
+    <Compile Include="Assets\Scripts\UI\Crafting.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />

@@ -50,6 +50,7 @@ public class Raft : ObjectData
 		Vector3 boxScale = componentBox.transform.localScale;
 		cellSizeX = componentSize.x * boxScale.x;
 		cellSizeZ = componentSize.z * boxScale.y;
+		componentBox.enabled = false;
 
 		List<ObjectData> temporaryList = new List<ObjectData>(components);
 		components.Clear();

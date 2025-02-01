@@ -18,20 +18,24 @@ public class Water : MonoBehaviour
 	private void OnTriggerStay(Collider other)
 	{
 		ObjectData floatingObject = other.GetComponent<ObjectData>();
+		float boyancyProvided = 0;
 		if (floatingObject == null) return;
 		if (Raft.IsRaftComponent(floatingObject))
 		{
 			floatingObject = floatingObject.transform.parent.GetComponent<ObjectData>();
+			Raft raft = floatingObject.GetComponent<Raft>();
 			floatingObject.velocity += (new Vector3(raftFlowDirection.x, 0, raftFlowDirection.y)
 				* Time.deltaTime) / floatingObject.mass;
+			boyancyProvided = (density * data.gravity * ((transform.position.y + floatOffset) - floatingObject.transform.position.y) * Time.deltaTime) / raft.components.Count;
 		}
 		else
 		{
 			floatingObject.velocity += (new Vector3(flowDirection.x, 0, flowDirection.y) 
 				* Time.deltaTime) / floatingObject.mass;
+			boyancyProvided = density * data.gravity * ((transform.position.y + floatOffset) - floatingObject.transform.position.y) * Time.deltaTime;
+
 		}
 
-		float boyancyProvided = density * data.gravity * ((transform.position.y + floatOffset) - floatingObject.transform.position.y) * Time.deltaTime;
 		floatingObject.velocity.y += boyancyProvided;
 	}
 
