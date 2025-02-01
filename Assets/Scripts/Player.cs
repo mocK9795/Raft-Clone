@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(CharacterController))]
 public class Player : ObjectData
@@ -19,11 +20,11 @@ public class Player : ObjectData
 	public LayerMask waterMask;
 	public int selectedLayer;
 	public int interactableLayer;
-	int lastPickedUpItemLayer;
+	List<int> itemStackLayers = new List<int>();
 	
 	[Header("Interaction")]
 	public Raft raft;
-	public ObjectData heldItem;
+	[HideInInspector] public List<ObjectData> itemStack = new List<ObjectData>();
 	public GameObject buildObject;
 	public float boatLeaveVelocity = 2f;
 	
@@ -175,31 +176,55 @@ public class Player : ObjectData
 			return;
 		}
 
-		int lastHeldItemIndex = -1;
-		if (heldItem != null)
+		if (itemStack != null && isJumping)
 		{
-			lastHeldItemIndex = heldItem.gameObject.GetInstanceID();
-			heldItem.gameObject.layer = lastPickedUpItemLayer;
-			heldItem.transform.parent = transform.parent;
-			heldItem.enabled = true;
-			heldItem.velocity = Vector3.zero;
-			heldItem = null;
+			itemStack[0].gameObject.layer = itemStackLayers[0];
+			itemStack[0].transform.parent = transform.parent;
+			itemStack[0].enabled = true;
+			itemStack[0].velocity = playerCamera.transform.forward * data.itemThrowStrength;
+			itemStackLayers.RemoveAt(0);
+			itemStack.RemoveAt(0);
+			RestackItems();
 		}
+		if (isJumping) return;
+		
 		if (!Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hitInfo, yoinkRange, yoinkableObjects)) return;
 
-		heldItem = hitInfo.collider.GetComponent<ObjectData>();
+		ObjectData selectedObject = hitInfo.collider.GetComponent<ObjectData>();
 
-		if (heldItem == null) return;
-		if (heldItem.withinParent) return;
-		if (heldItem.gameObject.GetInstanceID() == lastHeldItemIndex) return;
+		if (selectedObject == null) return;
+		if (selectedObject.withinParent) return;
 
-		heldItem.enabled = false;
-		lastPickedUpItemLayer = heldItem.gameObject.layer;
-		heldItem.gameObject.layer = selectedLayer;
-		heldItem.transform.parent = transform;
-		heldItem.transform.localPosition = data.heldItemOffset;
-		Vector3 heldItemRotation = heldItem.transform.eulerAngles;
-		heldItem.transform.localRotation = Quaternion.Euler(heldItemRotation.x, 0, heldItemRotation.z);
+		selectedObject.enabled = false;
+		itemStackLayers.Add(selectedObject.gameObject.layer);
+		selectedObject.gameObject.layer = selectedLayer;
+		selectedObject.transform.parent = transform;
+		selectedObject.transform.localPosition = data.heldItemOffset;
+		Vector3 selectedItemRotation = selectedObject.transform.eulerAngles;
+		selectedObject.transform.localRotation = Quaternion.Euler(selectedItemRotation.x, 0, selectedItemRotation.z);
+		itemStack.Add(selectedObject);
+
+		RestackItems();
+	}
+
+	public void RestackItems()
+	{
+		if (itemStack.Count < 1) return;
+		itemStack[0].transform.localPosition = data.heldItemOffset;
+		if (itemStack.Count < 2) return;
+
+		for (int i = 1; i < itemStack.Count; i++)
+		{
+			ObjectData prevItem = itemStack[i-1];
+			Collider prevCollider = prevItem.GetComponent<Collider>();
+			Vector3 prevItemSize = prevCollider.bounds.size;
+			float height = prevItemSize.y * Mathf.Abs(prevItem.transform.up.y) +
+						   prevItemSize.x * Mathf.Abs(prevItem.transform.up.x) +
+						   prevItemSize.z * Mathf.Abs(prevItem.transform.up.z);
+			height /= 2f;
+			ObjectData item = itemStack[i];
+			item.transform.localPosition = prevItem.transform.localPosition + Vector3.up * height;
+		}
 	}
 
 	public void OnAttack(InputAction.CallbackContext value) {if (value.canceled) OnAttack();}

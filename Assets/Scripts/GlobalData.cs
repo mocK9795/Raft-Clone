@@ -4,6 +4,7 @@ public class GlobalData : MonoBehaviour
 {
     public float gravity;
     public float friction;
+    public float itemThrowStrength;
     public Vector3 heldItemOffset;
     public Material outlineMaterial;
     public Material nullMaterial;

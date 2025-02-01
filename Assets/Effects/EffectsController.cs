@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -23,5 +22,11 @@ public class EffectsController : MonoBehaviour
 		{
 			underwaterEffect.SetActive(false);
 		}
+	}
+
+	[ContextMenu("Remove Effects")]
+	public void RemoveEffects()
+	{
+		underwaterEffect.SetActive(false);
 	}
 }

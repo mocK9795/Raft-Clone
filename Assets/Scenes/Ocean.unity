@@ -803,7 +803,7 @@ MonoBehaviour:
   selectedLayer: 7
   interactableLayer: 3
   raft: {fileID: 1710728870}
-  heldItem: {fileID: 0}
+  itemStack: []
   buildObject: {fileID: 8621602313980781530, guid: 65641bf7a51b47c4f84f2300f4fb899a, type: 3}
   boatLeaveVelocity: 2
   isBuilding: 0
@@ -1476,6 +1476,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravity: 1
   friction: 1
+  itemThrowStrength: 30
   heldItemOffset: {x: 0, y: 0.4, z: 2}
   outlineMaterial: {fileID: 2100000, guid: 48e8487f9681f824dbe041f644a778d3, type: 2}
   nullMaterial: {fileID: 2100000, guid: bcb301d1cbddef24eaa97f808d9e9717, type: 2}
