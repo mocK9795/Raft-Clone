@@ -266,6 +266,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 79755017}
     m_Modifications:
+    - target: {fileID: 689880729997558214, guid: 15c60401f3b17ca41aed57b2f749ec18, type: 3}
+      propertyPath: itemName
+      value: Swim Ring
+      objectReference: {fileID: 0}
     - target: {fileID: 4287613968142313192, guid: 15c60401f3b17ca41aed57b2f749ec18, type: 3}
       propertyPath: bonus
       value: 2
@@ -775,14 +779,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ada9f0b04c9d19344aa75e883baeb135, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemName: 
   mass: 6
   moveMode: 2
   interact: 0
   createConvexMesh: 0
   withinParent: 0
   velocity: {x: 0, y: 0, z: 0}
-  inventory:
-    items: []
   forceOfGravity: 0
   isInWater: 0
   data: {fileID: 0}
@@ -1206,6 +1209,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 92d1a29126141b141aa6b37fedb15763, type: 3}
+      propertyPath: m_StaticShadowCaster
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 92d1a29126141b141aa6b37fedb15763, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: d7447d34dd73f4343aabff2ccd22dbb2, type: 2}
@@ -1339,6 +1346,10 @@ PrefabInstance:
     - target: {fileID: 7730543801981773382, guid: 40988a038bb95a44fb0cfc7d333727eb, type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8123657320963771056, guid: 40988a038bb95a44fb0cfc7d333727eb, type: 3}
+      propertyPath: itemName
+      value: Hook
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1482,6 +1493,7 @@ MonoBehaviour:
   nullMaterial: {fileID: 2100000, guid: bcb301d1cbddef24eaa97f808d9e9717, type: 2}
   water: {fileID: 918964871}
   target: {fileID: 724599168}
+  crafter: {fileID: 11400000, guid: 2acf824111b154d499d24f6c449f8526, type: 2}
 --- !u!114 &1087618487
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1643,14 +1655,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df51128b75829ae48bd76d762a01bf23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemName: 
   mass: 2
   moveMode: 0
   interact: 1
   createConvexMesh: 1
   withinParent: 0
   velocity: {x: 0, y: 0, z: 0}
-  inventory:
-    items: []
   forceOfGravity: 0
   isInWater: 0
   data: {fileID: 0}
@@ -1695,6 +1706,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 79755017}
     m_Modifications:
+    - target: {fileID: 4244251519816941778, guid: 16613f906c6fea54d9879aa1c29ab95f, type: 3}
+      propertyPath: itemName
+      value: Rock
+      objectReference: {fileID: 0}
     - target: {fileID: 5101904060241485278, guid: 16613f906c6fea54d9879aa1c29ab95f, type: 3}
       propertyPath: m_LocalScale.y
       value: 47.20716
@@ -1769,6 +1784,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1710728869}
     m_Modifications:
+    - target: {fileID: 3139890085903188350, guid: 65641bf7a51b47c4f84f2300f4fb899a, type: 3}
+      propertyPath: itemName
+      value: Raft Platform
+      objectReference: {fileID: 0}
     - target: {fileID: 8621602313980781530, guid: 65641bf7a51b47c4f84f2300f4fb899a, type: 3}
       propertyPath: m_Name
       value: Raft Platform
@@ -1918,6 +1937,10 @@ PrefabInstance:
     - target: {fileID: 5319229203281325607, guid: 00e17f88c23c5b54eb3669d7ba3770db, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8403570451182732335, guid: 00e17f88c23c5b54eb3669d7ba3770db, type: 3}
+      propertyPath: itemName
+      value: Plank
       objectReference: {fileID: 0}
     - target: {fileID: 8403570451182732335, guid: 00e17f88c23c5b54eb3669d7ba3770db, type: 3}
       propertyPath: withinParent

@@ -58,7 +58,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 4bfae128486201345a7d7e6ab1249670, type: 2}
     - target: {fileID: 919132149155446097, guid: 778e2317d42deb44897249f299ea66b1, type: 3}
       propertyPath: m_Name
-      value: Raft Platform
+      value: Raft Platform Old
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -91,16 +91,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83c51bf4c8793214f9e64278f8916335, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemName: Raft Platform Old
   mass: 7
   moveMode: 1
   interact: 1
   createConvexMesh: 1
   withinParent: 1
   velocity: {x: 0, y: 0, z: 0}
-  inventory:
-    items:
-    - name: Plank
-      count: 4
   forceOfGravity: 0
   isInWater: 0
   data: {fileID: 0}

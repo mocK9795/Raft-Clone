@@ -26,7 +26,7 @@ public class Raft : ObjectData
 		component.enabled = false;
 		component.transform.parent = transform;
 
-		if (massCalculation == MassRecalculationMode.Average) mass = (mass + component.mass) / 2f; 
+		if (massCalculation == MassRecalculationMode.Average) mass = (mass + component.mass) / 2f;
 		else if (massCalculation == MassRecalculationMode.Addition) mass += component.mass;
 		
 		components.Add(component);
@@ -67,80 +67,5 @@ public class Raft : ObjectData
 		Raft raft = component.GetComponentInParent<Raft>();
 		if (raft == null) return false;
 		return true;
-	}
-}
-
-[System.Serializable]
-public struct Inventory
-{
-	public List<Item> items;
-
-	public Inventory(List<Item> items) : this() {this.items = items;}
-	public Inventory(Item item) : this() { items = new List<Item> { item }; }
-
-	public bool Includes(Inventory inventory)
-	{
-		foreach (Item otherItem in inventory.items)
-		{
-			if (!Includes(otherItem)) return false;
-		}
-		return true;
-	}
-	
-	public bool Includes(Item item)
-	{
-		foreach (Item containdedItem in items) { 
-			if (containdedItem.Contains(item)) return true;
-		}
-		return false;
-	}
-
-	public void Add(Inventory inventory)
-	{
-		foreach (Item otherItem in inventory.items)
-		{
-			Add(otherItem);
-		}
-	}
-
-	public void Add(Item item) 
-	{
-		for (int i = 0; i < items.Count; i++)
-		{
-			Item containedItem = items[i];
-			if (containedItem.Equals(item))
-			{
-				containedItem.count += item.count;
-				items[i] = containedItem;
-				return;
-			}
-		}
-
-		items.Add(item);
-	}
-}
-
-[System.Serializable]
-public struct Item
-{
-	public string name;
-	public int count;
-
-	public Item(string name, int count) : this()
-	{
-		this.name = name;
-		this.count = count;
-	}
-
-	public bool Equals(Item item)
-	{
-		if (item.name ==  name) return true;
-		return false;
-	}
-
-	public bool Contains(Item item)
-	{
-		if (item.name == name && count >= item.count) return true;
-		return false;
 	}
 }

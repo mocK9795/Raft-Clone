@@ -101,16 +101,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83c51bf4c8793214f9e64278f8916335, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemName: Rock
   mass: 30
   moveMode: 1
   interact: 1
   createConvexMesh: 1
   withinParent: 0
   velocity: {x: 0, y: 0, z: 0}
-  inventory:
-    items:
-    - name: Rock
-      count: 1
   forceOfGravity: 0
   isInWater: 0
   data: {fileID: 0}

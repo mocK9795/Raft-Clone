@@ -10,6 +10,7 @@ public class GlobalData : MonoBehaviour
     public Material nullMaterial;
     public GameObject water;
     public Transform target;
+    public Crafter crafter;
 
 	private void Update()
 	{

@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 
 [RequireComponent(typeof(CharacterController))]
 public class Player : ObjectData
@@ -27,12 +26,12 @@ public class Player : ObjectData
 	[HideInInspector] public List<ObjectData> itemStack = new List<ObjectData>();
 	public GameObject buildObject;
 	public float boatLeaveVelocity = 2f;
+	int lastSelectedItemId = -1;
 	
 	Vector2 moveDirection;
 	PlayerCamera playerCamera;
 	ObjectData lastSelectedObject;
 	Interactable lastInteractable;
-	Console console;
 	
 	[HideInInspector]
 	public bool isBuilding;
@@ -44,41 +43,16 @@ public class Player : ObjectData
 	bool usingHook;
 
 	public void OnCrouch(InputAction.CallbackContext value) { isCrouching = !value.canceled; }
-
 	public void OnMove(InputAction.CallbackContext value)
 	{
 		moveDirection = value.ReadValue<Vector2>();
 	}
-
-	private new void Update()
-	{
-		if (isInWater)
-		{
-			if (isJumping) velocity.y += swimJumpHeight * Time.deltaTime;
-			if (isCrouching) velocity.y -= crouchStrength * Time.deltaTime;
-			currentSpeed = swimSpeed;
-		}
-		else if (controller.isGrounded)
-		{
-			if (isJumping)
-			{
-				velocity.y = jumpHeight;
-			}
-			currentSpeed = speed;
-		}
-		if (boatInteracter)
-		{
-			currentSpeed = lastInteractable.bonus;
-		}
-		velocity += (transform.right * moveDirection.x + transform.forward * moveDirection.y) * currentSpeed * Time.deltaTime;
-			
-		base.Update();
-	}
-
 	public void OnJump(InputAction.CallbackContext value)
 	{
 		isJumping = !value.canceled;
 	}
+	public void OnInteract(InputAction.CallbackContext value) { if (value.canceled) OnInteract(); }
+	public void OnAttack(InputAction.CallbackContext value) { if (value.canceled) OnAttack(); }
 
 	public void OnInteract()
 	{
@@ -102,18 +76,19 @@ public class Player : ObjectData
 		usingHook = false;
 		lastInteractable = null;
 
-		int lastSelectedId = -1;
+		lastSelectedItemId = -1;
 		if (lastSelectedObject != null)
 		{
 			lastSelectedObject.UnOutline();
-			lastSelectedId = lastSelectedObject.GetInstanceID();
+			lastSelectedItemId = lastSelectedObject.GetInstanceID();
 		}
 		lastSelectedObject = null;
 
 		if (!Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hitInfo, range, yoinkableObjects)) return;
 		ObjectData selectedObject = hitInfo.collider.GetComponent<ObjectData>();
 		if (selectedObject == null) return;
-		if (selectedObject.GetInstanceID() == lastSelectedId) return;
+		if (selectedObject.GetInstanceID() == lastSelectedItemId) return;
+		lastSelectedItemId = selectedObject.GetInstanceID();
 
 		selectedObject.Outline();
 		lastSelectedObject = selectedObject;
@@ -150,13 +125,15 @@ public class Player : ObjectData
 
 	}
 
-	public void OnInteract(InputAction.CallbackContext value) { if (value.canceled) OnInteract(); }
-
 	public void OnAttack()
 	{
 		if (isBuilding)
 		{
 			if (!Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit rayInfo, yoinkRange, waterMask)) return;
+			Inventory stack = GetStackAsInventory();
+			Inventory cost = data.crafter.GetCost(buildObject);
+			if (stack.Includes(cost)) RemoveInventoryFromStack(cost);
+			else return;
 			GameObject builtObject = Instantiate(buildObject);
 			builtObject.transform.position = rayInfo.point;
 			bool success = raft.AddComponent(builtObject);
@@ -175,8 +152,9 @@ public class Player : ObjectData
 
 			return;
 		}
+		else if (boatInteracter) return;
 
-		if (itemStack != null && isJumping)
+		if (itemStack != null && isJumping && itemStack.Count > 0)
 		{
 			itemStack[0].gameObject.layer = itemStackLayers[0];
 			itemStack[0].transform.parent = transform.parent;
@@ -186,7 +164,7 @@ public class Player : ObjectData
 			itemStack.RemoveAt(0);
 			RestackItems();
 		}
-		if (isJumping) return;
+		if (isJumping && itemStack.Count > 0) return;
 		
 		if (!Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hitInfo, yoinkRange, yoinkableObjects)) return;
 
@@ -194,6 +172,7 @@ public class Player : ObjectData
 
 		if (selectedObject == null) return;
 		if (selectedObject.withinParent) return;
+		if (selectedObject.gameObject.GetInstanceID() == lastSelectedItemId) return;
 
 		selectedObject.enabled = false;
 		itemStackLayers.Add(selectedObject.gameObject.layer);
@@ -217,24 +196,83 @@ public class Player : ObjectData
 		{
 			ObjectData prevItem = itemStack[i-1];
 			Collider prevCollider = prevItem.GetComponent<Collider>();
-			Vector3 prevItemSize = prevCollider.bounds.size;
-			float height = prevItemSize.y * Mathf.Abs(prevItem.transform.up.y) +
+			Vector3 prevItemSize = prevCollider.bounds.extents;
+			float prevItemHeight = prevItemSize.y * Mathf.Abs(prevItem.transform.up.y) +
 						   prevItemSize.x * Mathf.Abs(prevItem.transform.up.x) +
 						   prevItemSize.z * Mathf.Abs(prevItem.transform.up.z);
-			height /= 2f;
 			ObjectData item = itemStack[i];
-			item.transform.localPosition = prevItem.transform.localPosition + Vector3.up * height;
+			Collider itemCollider = item.GetComponent<Collider>();
+			Vector3 itemSize = itemCollider.bounds.extents;
+			float itemHeight = itemSize.y * Mathf.Abs(item.transform.up.y) +
+						   itemSize.x * Mathf.Abs(item.transform.up.x) +
+						   itemSize.z * Mathf.Abs(item.transform.up.z);
+			item.transform.localPosition = prevItem.transform.localPosition + Vector3.up * prevItemHeight + Vector3.up * itemHeight;
 		}
 	}
 
-	public void OnAttack(InputAction.CallbackContext value) {if (value.canceled) OnAttack();}
+	public Inventory GetStackAsInventory()
+	{
+		Inventory inventory = new Inventory("");
+
+		foreach (ObjectData item in itemStack)
+		{
+			Item newItem = new Item(item.itemName, 1);
+			inventory.Add(newItem);
+		}
+		return inventory;
+	}
+
+	public void RemoveInventoryFromStack(Inventory inventory)
+	{
+		foreach (Item item in inventory.items)
+		{
+			for (int i = 0; i < item.count; i++) 
+			{
+				for (int stackIndex = 0; stackIndex < itemStack.Count; stackIndex++)
+				{
+					if (itemStack[stackIndex].itemName == item.name)
+					{
+						Destroy(itemStack[stackIndex].gameObject);
+						itemStack.RemoveAt(stackIndex);
+						itemStackLayers.RemoveAt(stackIndex);
+						break;
+					}
+				}
+			}
+		}
+	}
 
 	private new void Start()
 	{
 		base.Start();
 		playerCamera = FindAnyObjectByType<PlayerCamera>();
 		controller = GetComponent<CharacterController>();
-		console = FindFirstObjectByType<Console>();
 		interact = true;
 	}
+
+	private new void Update()
+	{
+		if (isInWater)
+		{
+			if (isJumping) velocity.y += swimJumpHeight * Time.deltaTime;
+			if (isCrouching) velocity.y -= crouchStrength * Time.deltaTime;
+			currentSpeed = swimSpeed;
+		}
+		else if (controller.isGrounded)
+		{
+			if (isJumping)
+			{
+				velocity.y = jumpHeight;
+			}
+			currentSpeed = speed;
+		}
+		if (boatInteracter)
+		{
+			currentSpeed = lastInteractable.bonus;
+		}
+		velocity += (transform.right * moveDirection.x + transform.forward * moveDirection.y) * currentSpeed * Time.deltaTime;
+
+		base.Update();
+	}
+
 }

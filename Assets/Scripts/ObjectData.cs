@@ -1,8 +1,10 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ObjectData : MonoBehaviour
 {
 	[Header("General Object Data")]
+	public string itemName;
     public float mass;
 	public enum MoveMode {Transform, RigidBody, CharacterController}
 	public MoveMode moveMode;
@@ -10,7 +12,6 @@ public class ObjectData : MonoBehaviour
 	public bool createConvexMesh = true;
 	public bool withinParent = false;
     public Vector3 velocity;
-	public Inventory inventory;
 	[HideInInspector] public float forceOfGravity;
 	[HideInInspector] public bool isInWater;
 
