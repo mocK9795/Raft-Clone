@@ -108,8 +108,8 @@ public class ObjectData : MonoBehaviour
 	{
 		ObjectData obj = other.gameObject.GetComponent<ObjectData>();
 		if (obj == null) return;
-		if (!obj.interact) return;
 		if (obj.withinParent && withinParent) return;
+		if (!obj.interact) return;
 		velocity += obj.velocity * 0.5f;
 		obj.velocity = -obj.velocity * 0.5f;
 	}

@@ -20,6 +20,12 @@ public class Water : MonoBehaviour
 		ObjectData floatingObject = other.GetComponent<ObjectData>();
 		float boyancyProvided;
 		if (floatingObject == null) return;
+		else if (floatingObject.gameObject.GetComponent<Player>() != null)
+		{
+			floatingObject.velocity += (new Vector3(raftFlowDirection.x, 0, raftFlowDirection.y)
+				* Time.deltaTime) / floatingObject.mass;
+			boyancyProvided = (density * data.gravity * ((transform.position.y + floatOffset) - floatingObject.transform.position.y) * Time.deltaTime);
+		}
 		else if (Raft.IsRaftComponent(floatingObject))
 		{
 			floatingObject = floatingObject.transform.parent.GetComponent<ObjectData>();

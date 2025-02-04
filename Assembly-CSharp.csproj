@@ -72,6 +72,7 @@
     <Compile Include="Assets\Scripts\UI\Console.cs" />
     <Compile Include="Assets\Scripts\ObjectData.cs" />
     <Compile Include="Assets\Scripts\Raft.cs" />
+    <Compile Include="Assets\Scripts\StructureSummoner.cs" />
     <Compile Include="Assets\Scripts\UI\Crafter.cs" />
   </ItemGroup>
   <ItemGroup>
